@@ -3,245 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منشئ الأسئلة التفاعلي</title>
+    <title>منصة الاختبارات - أ. عبدالعزيز الفيفي</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     
     <style>
         :root {
-            --primary: #5d5fef;
-            --success: #27ae60;
-            --danger: #eb5757;
-            --bg: #f8f9fa;
-            --card-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            --primary: #2563eb;
+            --accent: #3b82f6;
+            --success: #059669;
+            --danger: #dc2626;
+            --bg: #f3f4f6;
+            --card-border: #e5e7eb;
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--bg);
             margin: 0;
-            padding: 40px 20px;
+            padding: 20px;
+            color: #1f2937;
+        }
+
+        /* ترويسة الصفحة الشخصية */
+        .user-header {
+            background: white;
+            width: 100%;
+            max-width: 850px;
+            margin: 0 auto 30px;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
             align-items: center;
+            border-bottom: 4px solid var(--primary);
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .header h1 { color: #2d3436; margin-bottom: 10px; }
-        .header p { color: #636e72; }
+        .user-info h2 { margin: 0; color: var(--primary); font-size: 1.4rem; }
+        .user-info p { margin: 5px 0 0; color: #6b7280; font-weight: bold; }
 
         .container {
             width: 100%;
             max-width: 850px;
+            margin: 0 auto;
         }
 
-        /* تصميم بطاقة السؤال */
+        /* تصميم البطاقة الاحترافي */
         .question-card {
-            background: #fff;
-            border-radius: 15px;
-            padding: 25px;
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
             margin-bottom: 25px;
-            box-shadow: var(--card-shadow);
-            border-right: 6px solid var(--primary);
-            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid var(--card-border); /* إطار ثابت ليظهر في PDF */
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
             position: relative;
+            page-break-inside: avoid; /* منع انقسام البطاقة بين صفحات PDF */
         }
 
-        @keyframes popIn {
-            from { transform: scale(0.9); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
+        .question-card::before {
+            content: "";
+            position: absolute;
+            right: 0; top: 0; bottom: 0;
+            width: 6px;
+            background: var(--primary);
+            border-radius: 0 12px 12px 0;
         }
 
         .input-group { margin-bottom: 15px; }
         
         label {
             display: block;
-            font-weight: 600;
+            font-weight: 700;
             margin-bottom: 8px;
-            font-size: 0.9rem;
-            color: #444;
+            color: #374151;
+            font-size: 0.95rem;
         }
 
         input[type="text"] {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #edf2f7;
-            border-radius: 10px;
+            padding: 10px 15px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
             box-sizing: border-box;
-            transition: all 0.3s ease;
+            background: #f9fafb;
             font-size: 1rem;
-        }
-
-        input[type="text"]:focus {
-            border-color: var(--primary);
-            outline: none;
-            background-color: #fff;
-            box-shadow: 0 0 0 4px rgba(93, 95, 239, 0.1);
         }
 
         .options-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
-            margin-top: 10px;
         }
 
         /* أزرار التحكم */
         .controls {
-            margin: 30px 0;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             display: flex;
-            gap: 20px;
-            justify-content: center;
+            gap: 15px;
+            z-index: 1000;
+            background: rgba(255,255,255,0.9);
+            padding: 10px 20px;
+            border-radius: 50px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            backdrop-filter: blur(5px);
         }
 
         .btn {
             border: none;
-            padding: 15px 35px;
-            border-radius: 12px;
+            padding: 12px 25px;
+            border-radius: 30px;
             font-weight: 700;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
+            gap: 8px;
+            transition: 0.3s;
         }
 
-        .btn-add {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 6px 15px rgba(93, 95, 239, 0.3);
-        }
-
-        .btn-add:hover { background: #4a4cdb; transform: translateY(-2px); }
-
-        .btn-pdf {
-            background: var(--danger);
-            color: white;
-            box-shadow: 0 6px 15px rgba(235, 87, 87, 0.3);
-        }
-
-        .btn-pdf:hover { background: #d44747; transform: translateY(-2px); }
+        .btn-add { background: var(--primary); color: white; }
+        .btn-pdf { background: var(--danger); color: white; }
+        .btn:hover { opacity: 0.9; transform: translateY(-2px); }
 
         .remove-btn {
             position: absolute;
-            top: 15px;
-            left: 15px;
-            color: #ccc;
+            top: 10px;
+            left: 10px;
+            color: #d1d5db;
             cursor: pointer;
-            transition: color 0.3s;
         }
         .remove-btn:hover { color: var(--danger); }
 
-        @media (max-width: 600px) {
-            .options-grid { grid-template-columns: 1fr; }
-            .controls { flex-direction: column; width: 100%; }
-            .btn { width: 100%; justify-content: center; }
+        /* تنسيق خاص للطباعة و PDF */
+        @media print {
+            .controls, .remove-btn { display: none !important; }
+            body { padding: 0; background: white; }
+            .question-card { box-shadow: none; border: 1px solid #000; }
         }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>صانع الأسئلة الاحترافي</h1>
-        <p>أنشئ أسئلتك الخاصة بكل سهولة ثم صدرها كـ PDF</p>
+    <div class="user-header" id="pdf-header">
+        <div class="user-info">
+            <h2>أ. عبدالعزيز الفيفي</h2>
+            <p>ثانوية الأمير عبدالمجيد 😉</p>
+        </div>
+        <div style="text-align: left; color: var(--primary);">
+            <i class="fas fa-graduation-cap fa-3x"></i>
+        </div>
     </div>
 
-    <div class="container" id="quiz-container">
+    <div class="container" id="quiz-content">
         </div>
 
     <div class="controls">
         <button class="btn btn-add" onclick="addQuestion()">
-            <i class="fas fa-plus-circle"></i> إضافة سؤال جديد
+            <i class="fas fa-plus-circle"></i> إضافة سؤال
         </button>
-        
         <button class="btn btn-pdf" id="pdfBtn" style="display: none;" onclick="saveAsPDF()">
-            <i class="fas fa-file-pdf"></i> حفظ كملف PDF
+            <i class="fas fa-file-export"></i> حفظ PDF
         </button>
     </div>
 
     <script>
-        let questionCount = 0;
+        let qCount = 0;
 
         function addQuestion() {
-            questionCount++;
-            const container = document.getElementById('quiz-container');
-            const pdfBtn = document.getElementById('pdfBtn');
-
+            qCount++;
+            const container = document.getElementById('quiz-content');
             const card = document.createElement('div');
             card.className = 'question-card';
-            card.id = `q-card-${questionCount}`;
+            card.id = `q-${qCount}`;
             
             card.innerHTML = `
-                <i class="fas fa-times-circle remove-btn" onclick="removeQuestion(${questionCount})"></i>
+                <i class="fas fa-trash remove-btn" onclick="this.parentElement.remove()"></i>
                 <div class="input-group">
-                    <label>السؤال ${questionCount}:</label>
-                    <input type="text" placeholder="اكتب نص السؤال هنا..." class="q-text">
+                    <label><i class="fas fa-question-circle" style="color:var(--primary)"></i> السؤال ${qCount}:</label>
+                    <input type="text" placeholder="اكتب السؤال هنا...">
                 </div>
                 <div class="options-grid">
                     <div class="input-group">
-                        <label>الخيار أ:</label>
-                        <input type="text" placeholder="الخيار الأول" class="opt">
+                        <label>أ)</label>
+                        <input type="text" placeholder="الخيار الأول">
                     </div>
                     <div class="input-group">
-                        <label>الخيار ب:</label>
-                        <input type="text" placeholder="الخيار الثاني" class="opt">
+                        <label>ب)</label>
+                        <input type="text" placeholder="الخيار الثاني">
                     </div>
                     <div class="input-group">
-                        <label>الخيار ج:</label>
-                        <input type="text" placeholder="الخيار الثالث" class="opt">
+                        <label>ج)</label>
+                        <input type="text" placeholder="الخيار الثالث">
                     </div>
                     <div class="input-group">
-                        <label>الخيار د:</label>
-                        <input type="text" placeholder="الخيار الرابع" class="opt">
+                        <label>د)</label>
+                        <input type="text" placeholder="الخيار الرابع">
                     </div>
                 </div>
-                <div class="input-group" style="margin-top:15px;">
-                    <label style="color: var(--success);">الإجابة الصحيحة:</label>
-                    <input type="text" placeholder="حدد الإجابة الصحيحة" style="border-color: var(--success);">
+                <div class="input-group">
+                    <label style="color: var(--success);"><i class="fas fa-check-double"></i> الإجابة الصحيحة:</label>
+                    <input type="text" placeholder="الإجابة..." style="border-color: var(--success);">
                 </div>
             `;
-
             container.appendChild(card);
-            
-            // إظهار زر PDF عند إضافة أول سؤال
-            pdfBtn.style.display = 'flex';
-            
-            // تمرير تلقائي لأسفل عند الإضافة
+            document.getElementById('pdfBtn').style.display = 'flex';
             window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
 
-        function removeQuestion(id) {
-            const card = document.getElementById(`q-card-${id}`);
-            card.style.opacity = '0';
-            card.style.transform = 'scale(0.8)';
-            setTimeout(() => {
-                card.remove();
-                if (document.querySelectorAll('.question-card').length === 0) {
-                    document.getElementById('pdfBtn').style.display = 'none';
-                }
-            }, 300);
-        }
-
         function saveAsPDF() {
-            const element = document.getElementById('quiz-container');
-            const pdfBtn = document.getElementById('pdfBtn');
-            const addBtn = document.querySelector('.btn-add');
+            // نأخذ الحاوية التي تجمع الترويسة والأسئلة معاً
+            const element = document.createElement('div');
+            element.appendChild(document.getElementById('pdf-header').cloneNode(true));
+            element.appendChild(document.getElementById('quiz-content').cloneNode(true));
 
-            // إعدادات التصدير
+            // إعدادات لضمان ظهور الإطارات والألوان في PDF
             const opt = {
-                margin:       10,
-                filename:     'الأسئلة.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
+                margin:       [10, 10],
+                filename:     'اختبار_عبدالعزيز_الفيفي.pdf',
+                image:        { type: 'jpeg', quality: 1 },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true, 
+                    letterRendering: true,
+                    logging: false
+                },
                 jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            // تشغيل التحويل
             html2pdf().set(opt).from(element).save();
         }
     </script>
